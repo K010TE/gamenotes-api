@@ -43,7 +43,7 @@ def add_game(game: Game):
     cursor.close()
     conn.close()
     return {"message": "Jogo adicionado com sucesso!"}
-    
+
 
 #DELETE
 @app.delete("/games/{id}")
@@ -51,7 +51,10 @@ def delete_game(id: int):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("DELETE FROM games WHERE id = %s", (id,))
+    if cursor.rowcount == 0:
+        raise HTTPException(status_code=404, detail="Jogo não encontrado")
     conn.commit()
     cursor.close()
     conn.close()
     return {"message": "Jogo deletado com sucesso!"}
+
