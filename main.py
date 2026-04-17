@@ -1,3 +1,4 @@
+import psycopg2.extras
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import psycopg2
@@ -25,7 +26,7 @@ def home():
 @app.get("/games")
 def get_games():
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute("SELECT * FROM games")
     games = cursor.fetchall()
     cursor.close()
