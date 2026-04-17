@@ -5,7 +5,6 @@ import os
 
 app = FastAPI()
 
-
 class Game(BaseModel):
     name: str
     platform: str
@@ -17,6 +16,10 @@ def get_db_connection():
     conn = psycopg2.connect(os.getenv("DATABASE_URL"), sslmode="require")
     return conn
 
+
+@app.get("/")
+def home():
+    return {"message": "Bem-vindo ao GameNotes API!"}
 
 #rota para listar todos os jogos
 @app.get("/games")
