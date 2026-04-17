@@ -1,0 +1,42 @@
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+import psycopg2
+import os
+
+app = FastAPI()
+
+
+class Game(BaseModel):
+    name: str
+    platform: str
+    score: int
+    review: str
+
+#abre e retorna a conexão com o banco de dados
+def get_db_connection():
+    conn = psycopg2.connect(os.getenv("DATABASE_URL"), sslmode="require")
+    return conn
+
+
+#rota para listar todos os jogos
+@app.get("/games")
+def get_games():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM games")
+    games = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return games
+
+#rota para adicionar um jogo
+@app.post("/games")
+def add_game(game: Game):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO games (name, platform, score, review) VALUES (%s, %s, %s, %s)", (game.name, game.platform, game.score, game.review))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return {"message": "Jogo adicionado com sucesso!"}
+
